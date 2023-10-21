@@ -1,0 +1,17 @@
+{
+  "name": "paipai-notification-csv",
+  "version": "1.0",
+  "description": "Paipai notifications csv",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab", "tabs", "alarms"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PAIPAI Notification CSV",
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [{ "matches": ["*://www.paipai.fmz/*"], "js": ["content_script.js"] }],
+  "host_permissions": ["*://www.paipai.fmz/*"]
+}
