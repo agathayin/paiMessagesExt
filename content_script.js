@@ -1,8 +1,3 @@
-chrome.storage.sync.get("paiMessages", (data) => {
-  data.unshift(location.href);
-  chrome.storage.sync.set({ paiMessages: data });
-});
-
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
   if (request.message !== null && request.message == "login") {
     let userinfo = document.querySelector("#td_userinfomore");
@@ -17,24 +12,35 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
   if (request.message !== null && request.message == "getPageUrlList") {
     try {
-      var pageTotal = document.querySelectorAll("").length;
-      var lastPage = document.querySelectorAll('ul[class="a-pagination"] span li a')[pageTotal - 1].innerHTML;
-      console.log("Last pages: " + lastPage);
-
-      var pageUrlList = [];
-
-      for (let i = 1; i <= lastPage; i++) {
-        let tmp = `https://sellercentral.amazon.com/orders-v3?page=${i}&date-range=${dateFrom}-${dateTo}`;
-        pageUrlList.push(tmp);
+      const pageTotalText = document.querySelector(".fr .pages .fl").innerHTML;
+      let pageTotal = pageTotalText.slice(1, pageTotalText.length - 1);
+      if (!pageTotal || !pageTotal.length) return sendResponse({ message: "Failed to find total pages" });
+      pageTotal = Number(pageTotal);
+      if (!pageTotal) return sendResponse({ message: "Cannot find urls" });
+      let urls = [];
+      for (let i = 1; i <= pageTotal; i++) {
+        let tmp = `https://www.paipai.fm/message.php?type=sms&boxname=inbox&action=rate&page=${i}`;
+        urls.push(tmp);
       }
+      sendResponse({ result: urls });
+    } catch (err) {
+      console.log("getPageUrlList", err);
+      sendResponse(err);
+    }
+  }
+});
 
-      console.log("Total pages: " + pageUrlList.length);
-      chrome.runtime.sendMessage({
-        message: "runPageScan",
-        data: pageUrlList,
-        orderDate: orderDate,
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+  if (request.message !== null && request.message == "getMessages") {
+    try {
+      let result = [];
+      let nodes = document.querySelectorAll(".value p.lh_18");
+      nodes.forEach((el) => {
+        if (el.innerHTML) {
+          result.push(el.innerHTML);
+        }
       });
-      sendResponse(true);
+      sendResponse(result);
     } catch (err) {
       console.log("getPageUrlList", err);
       sendResponse(err);

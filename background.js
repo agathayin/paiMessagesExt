@@ -3,7 +3,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.set({ paiMessages: [] });
 });
 
-var maxPage = 0;
+var messages = [];
 
 function download(data) {
   let blob = new Blob(data, { type: "text/plain;charset=UTF-8" });
@@ -12,9 +12,12 @@ function download(data) {
 }
 
 function addMessage(msg) {
-  chrome.storage.sync.get("paiMessages").then(({ data }) => {
-    data.unshift(msg);
-    chrome.storage.sync.set({ paiMessages: data });
+  chrome.storage.sync.get("paiMessages").then((result) => {
+    let messages = [];
+    if (result.paiMessages && result.paiMessages.length) messages = result.paiMessages;
+
+    messages.unshift(msg);
+    chrome.storage.sync.set({ paiMessages: messages });
   });
 }
 
@@ -23,7 +26,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     try {
       // clear records
       chrome.storage.sync.set({ paiMessages: [] });
-      maxPage = 0;
+      messages = [];
       // create tab
       let newTab = await chrome.tabs.create({
         url: "https://www.paipai.fm/message.php",
@@ -45,12 +48,32 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         return;
       }
       // find max page
-
+      let pageUrlList = await chrome.tabs.sendMessage(newTab.id, { message: "getPageUrlList" });
+      if (pageUrlList.message || !pageUrlList.result) {
+        addMessage(urls.message);
+        return;
+      }
       // check all pages
-
-      // add data into data
-
+      let pages = pageUrlList.result;
+      console.log(pages);
+      for (let url of pages) {
+        let msgTab = await chrome.tabs.create({
+          url: url,
+        });
+        await new Promise((resp) => setTimeout(resp, 3000));
+        if (msgTab && msgTab.id) {
+          let result = await chrome.tabs.sendMessage(msgTab.id, { message: "getMessages" });
+          if (result && result.length) {
+            console.log(result);
+            messages.push(...result);
+          }
+          try {
+            await chrome.tabs.remove(msgTab.id);
+          } catch (err) {}
+        }
+      }
       // format data into csv file and download
+      download(messages.join("\n"));
     } catch (err) {
       console.log(err);
     }

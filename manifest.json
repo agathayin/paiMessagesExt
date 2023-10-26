@@ -12,6 +12,6 @@
     "default_title": "PAIPAI Notification CSV",
     "default_icon": "icon.png"
   },
-  "content_scripts": [{ "matches": ["*://www.paipai.fmz/*"], "js": ["content_script.js"] }],
+  "content_scripts": [{ "matches": ["*://www.paipai.fm/*"], "js": ["content_script.js"] }],
   "host_permissions": ["*://www.paipai.fmz/*"]
 }
