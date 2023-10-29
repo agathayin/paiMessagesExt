@@ -72,9 +72,13 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
             return el;
           }
         });
-        let influence = line[1].split(":");
-        let iType = influence[0] || "";
-        let iScore = influence[1] || "";
+        let iType = "";
+        let iScore = "";
+        if (line && line[1] && line[1].length) {
+          let influence = line[1].split(":");
+          iType = influence[0] || "";
+          iScore = influence[1] || "";
+        }
         line.push(iType, iScore);
         return line.join(",");
       });

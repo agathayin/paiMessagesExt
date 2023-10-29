@@ -7,5 +7,3 @@ function loadnr() {
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("start_request").addEventListener("click", loadnr);
 });
-
-loadMessage();
