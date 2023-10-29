@@ -6,7 +6,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "tabs", "alarms"],
+  "permissions": ["activeTab", "tabs", "alarms", "downloads"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "PAIPAI Notification CSV",
