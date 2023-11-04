@@ -5,7 +5,15 @@
   </head>
   <body>
     <div id="container">
-      <div id="button"><button id="start_request">Start Request</button></div>
+      <p>Click "Start" to load each rate messages and export them into a CSV file.</p>
+      <p><b>Pages</b>(optional)</p>
+      <div id="pageInputs">
+        <label>Start page</label>
+        <input type="number" name="startPage" id="startPageInput" />
+        <label>End page</label>
+        <input type="number" name="endPage" id="endPageInput" />
+      </div>
+      <div id="button"><button id="start_request">Start</button></div>
       <div id="message"></div>
     </div>
   </body>

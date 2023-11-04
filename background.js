@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
       messages = [];
       // create tab
       let newTab = await chrome.tabs.create({
-        url: "https://www.paipai.fm/message.php",
+        url: "https://www.paipai.fm/message.php?type=sms&boxname=&action=rate&boxname=inbox",
       });
       await new Promise((resp) => setTimeout(resp, 3000));
       if (!newTab || !newTab.id) {
@@ -19,11 +19,15 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         return;
       }
       // check if logged in
-      let userName = await chrome.tabs.sendMessage(newTab.id, {
+      await chrome.tabs.sendMessage(newTab.id, {
         message: "login",
       });
       // find max page
-      let pageUrlList = await chrome.tabs.sendMessage(newTab.id, { message: "getPageUrlList" });
+      let pageUrlList = await chrome.tabs.sendMessage(newTab.id, {
+        message: "getPageUrlList",
+        startPage: request.startPage,
+        endPage: request.endPage,
+      });
       if (pageUrlList.message || !pageUrlList.result) {
         return;
       }
@@ -63,7 +67,14 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
       ];
       let content = messages.map((el) => {
         let line = el.split("\n");
+        // clean last line and format reason
         line = line.slice(0, line.length - 1);
+        if (line.length > 7) {
+          let text = line.slice(6, line.length).join("; ");
+          line[6] = text;
+          line = line.slice(0, 7);
+        }
+        // format content
         line = line.map((el, i) => {
           let index = el.indexOf("：");
           if (index > -1) {

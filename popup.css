@@ -1,6 +1,26 @@
+#container {
+  min-width: 400px;
+}
 #start_request {
   background: #e0e8f7;
   border: 1px solid #475f8f;
   border-radius: 3px;
   color: #475f8f;
+  padding: 1em;
+  width: 100%;
+}
+
+#pageInputs {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+#pageInputs input {
+  padding: 0.5em;
+  margin-right: 0.5em;
+  border-radius: 3px;
+  border: 1px solid #ddd;
 }
